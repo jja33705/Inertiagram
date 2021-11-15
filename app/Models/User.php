@@ -30,6 +30,8 @@ class User extends Authenticatable
         'username',
     ];
 
+    protected $with = ['profile'];
+
     /**
      * The attributes that should be hidden for serialization.
      *
@@ -59,4 +61,14 @@ class User extends Authenticatable
     protected $appends = [
         'profile_photo_url',
     ];
+
+    public function profile()
+    {
+        return $this->hasOne(Profile::class);
+    }
+
+    public function posts()
+    {
+        return $this->hasMany(Post::class);
+    }
 }
