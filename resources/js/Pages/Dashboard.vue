@@ -134,7 +134,7 @@
 
             selectNewImage() {
                 this.$refs.image.click();
-            }
+            },
         }
     })
 </script>
