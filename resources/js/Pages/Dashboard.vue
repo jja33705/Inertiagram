@@ -11,7 +11,7 @@
                     </h2>
                     <jet-secondary-button class="mb-4" @click="createNewPost=true">Add New Post</jet-secondary-button>
                     <div class="mb-4 flex flex-row">
-                        <div class="mr-10">게시물 4</div>
+                        <div class="mr-10">게시물 <span class="font-black">{{ posts.length }}</span></div>
                         <div class="mr-10">팔로워 80</div>
                         <div class="mr-10">팔로우 72</div>
                     </div>
@@ -26,7 +26,7 @@
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
                 <div class="bg-white overflow-hidden shadow-xl sm:rounded-lg">
-                    <post-list />
+                    <post-list :posts="posts" />
                 </div>
             </div>
         </div>
@@ -83,7 +83,7 @@
     import JetLabel from '@/Jetstream/Label.vue';
 
     export default defineComponent({
-        props: ['user'],
+        props: ['user', 'posts'],
         components: {
             AppLayout,
             PostList,
@@ -117,7 +117,7 @@
                 });
             },
 
-            crearFields() {
+            clearFields() {
                 this.form.caption = '';
                 this.form.image = '';
             },

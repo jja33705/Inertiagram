@@ -3,6 +3,7 @@
 use App\Http\Controllers\PostsController;
 use App\Http\Controllers\ProfilesController;
 use Illuminate\Foundation\Application;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -27,7 +28,10 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return Inertia::render('Dashboard', ['userName' => auth()->user()->name]);
+    return Inertia::render('Dashboard', [
+        'user' => Auth::user(),
+        'posts' => Auth::user()->posts,
+    ]);
 })->name('dashboard');
 
 // Route::middleware(['auth:sanctum', 'verified'])->apiResource('/profiles', ProfilesController::class);
