@@ -14,6 +14,13 @@ class Post extends Model
         'image',
     ];
 
+    protected $with = ['user'];
+
+    public function getImageAttribute($value) //Accessor
+    {
+        return '/storage/' . $value;
+    }
+
     public function user()
     {
         return $this->belongsTo(User::class);

@@ -1,7 +1,7 @@
 <template>
     <div>
         <div class="mt-5 overflow-hidden rounded shadow-lg">
-            <a @click="imgClicked()"><img class="w-full" :src="`/storage/${post.image}`" :alt="post.image"></a>
+            <a @click="imgClicked()"><img class="w-full" :src="post.image" :alt="post.image"></a>
         </div>
 
         <jet-dialog-modal :show="showPost" @close="showPost = false">
@@ -13,8 +13,32 @@
                             <i class="fas fa-ellipsis-h pt-2 text-lg"></i>
                         </span>
                     </div>
-                    <img class="w-full bg-cover" :src="`/storage/${post.image}`" alt="photo" />
+                    <img class="w-full bg-cover" :src="post.image" alt="photo" />
                     <div class="px-3 pb-2">
+                        <div class="flex flex-row items-center mt-2">
+                            <div class="flex-shrink-0 mr-3">
+                                <Link :href="`/profile/${post.user.name}`">
+                                    <img class="object-cover w-10 h-10 rounded-full" :src="post.user.profile_photo_url" :alt="post.user.name" />
+                                </Link>
+                            </div>
+                            <Link :href="`/profiles/${post.user.name}`">
+                                <span class="mr-1 font-black">{{ post.user.name }}</span>
+                            </Link>
+                            <span class="mr-1 font-black">팔로잉</span>
+                        </div>
+                        <hr class="my-4">
+                        <div class="flex flex-row mt-2">
+                            <div class="flex-shrink-0 mr-3">
+                                <Link :href="`/profiles/${post.user.name}`">
+                                    <img class="object-cover w-10 h-10 rounded-full" :src="post.user.profile_photo_url" :alt="post.user.name" />
+                                </Link>
+                            </div>
+                            <Link :href="`/profile/${post.user.name}`">
+                                <span class="mr-1 font-black">{{ post.user.name }}</span>
+                            </Link>
+                        </div>
+
+
                         <div class="mt-2">
                             <span>{{ post.caption }}</span>
                         </div>
@@ -62,6 +86,7 @@
 
 <script>
 import JetDialogModal from '@/Jetstream/ConfirmationModal.vue';
+import { Link } from '@inertiajs/inertia-vue3';
 export default {
     props: ['post'],
     data() {
@@ -71,6 +96,7 @@ export default {
     },
     components: {
         JetDialogModal,
+        Link,
     },
     methods: {
         imgClicked() {

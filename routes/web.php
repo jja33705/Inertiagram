@@ -4,6 +4,7 @@ use App\Http\Controllers\PostsController;
 use App\Http\Controllers\ProfilesController;
 use Illuminate\Foundation\Application;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -28,17 +29,22 @@ Route::get('/', function () {
 });
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/dashboard', function () {
-    return Inertia::render('Dashboard', [
-        'user' => Auth::user(),
-        'posts' => Auth::user()->posts,
+    // return Inertia::render('Dashboard', [
+    //     'user' => Auth::user(),
+    //     'posts' => Auth::user()->posts,
+    // ]);
+    return Redirect::route('profile.index', [
+        'name' => Auth::user()->name,
     ]);
 })->name('dashboard');
 
 // Route::middleware(['auth:sanctum', 'verified'])->apiResource('/profiles', ProfilesController::class);
 //create와 edit는 제외하고 만들어줌
 
-Route::middleware(['auth:sanctum', 'verified'])->get('/profiles/{name}', [ProfilesController::class, 'index']);
+Route::middleware(['auth:sanctum', 'verified'])->get('/profiles/{name}', [ProfilesController::class, 'index'])->name('profile.index');
 
 Route::middleware(['auth:sanctum', 'verified'])->get('/post/create', [PostsController::class, 'create'])->name('post.create');
 
 Route::middleware(['auth:sanctum', 'verified'])->post('/post/store', [PostsController::class, 'store'])->name('post.store');
+
+Route::middleware(['auth:sanctum', 'verified'])->patch('/profile/update', [ProfilesController::class, 'update'])->name('profile.update');

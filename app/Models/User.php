@@ -30,6 +30,16 @@ class User extends Authenticatable
         'username',
     ];
 
+    protected static function booted()
+    {
+        static::created(function ($user) { //새로 사용자가 만들어지면 자동으로 프로필이 생성된다.
+            $user->profile()->create([
+                'title' => $user->username,
+                'description' => 'No description',
+            ]);
+        });
+    }
+
     protected $with = ['profile'];
 
     /**

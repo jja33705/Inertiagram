@@ -4,6 +4,8 @@ namespace App\Http\Controllers;
 
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Redirect;
 use Inertia\Inertia;
 
 class ProfilesController extends Controller
@@ -18,7 +20,11 @@ class ProfilesController extends Controller
         $user = User::where('name', $name)->first();
 
         if ($user) {
-            return Inertia::render('Dashboard', ['user' => $user]);
+            return Inertia::render('Dashboard', [
+                'user' => $user,
+                'posts' => $user->posts,
+                'can' => ['create_update' => Auth::user()->id == $user->id],
+            ]);
         } else {
             return Inertia::render('Notfound');
         }
@@ -74,9 +80,16 @@ class ProfilesController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\Response
      */
-    public function update(Request $request, $id)
+    public function update(Request $request)
     {
-        //
+        $data = $request->validate(['title' => 'required', 'description' => 'required']);
+
+        Auth::user()->profile->update($data);
+
+        return Redirect::route('profile.index', [
+            'name' => Auth::user()->name,
+            'can' => ['create_update' => true],
+        ]);
     }
 
     /**

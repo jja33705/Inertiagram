@@ -1,27 +1,33 @@
 <template>
     <app-layout title="Dashboard">
         <template #header>
-            <div class="flex flex-row items-start">
-                <div class="flex-shrink-0 mr-3 px-40" v-if="$page.props.jetstream.managesProfilePhotos">
-                    <img :src="user.profile_photo_url" :alt="user.name" class="rounded-full h-40 w-40 object-cover">
-                </div>
-                <div class="flex-col justify-items-start">
-                    <h2 class="font-semibold text-xl text-gray-800 leading-tight">
-                        {{ user.name }}
-                    </h2>
-                    <jet-secondary-button class="mb-4" @click="createNewPost=true">Add New Post</jet-secondary-button>
-                    <div class="mb-4 flex flex-row">
-                        <div class="mr-10">게시물 <span class="font-black">{{ posts.length }}</span></div>
-                        <div class="mr-10">팔로워 80</div>
-                        <div class="mr-10">팔로우 72</div>
+            <div class="flex flex-col items-start md:flex-row">
+                <div class="flex flex-row items-start">
+                    <div class="flex-shrink-0 mr-3 px-40" v-if="$page.props.jetstream.managesProfilePhotos">
+                        <img :src="user.profile_photo_url" :alt="user.name" class="rounded-full h-40 w-40 object-cover">
                     </div>
-                    <div class="mb-4">{{ user.username }}</div>
-                    <div class="mb-2 font-semibold text-lg">{{ user.profile? user.profile.title : 'No Title' }}</div>
-                    <div class='mb-4'>{{ user.profile? user.profile.description : 'No Description' }}</div>
+                    <div class="flex-col justify-items-start">
+                        <div class="flex flex-row items-end my-4">
+                            <h2 class="mb-4 font-semibold text-xl text-gray-800 leading-tight">
+                                {{ user.name }}
+                            </h2>
+                            <button class="px-2 mx-4 mb-4 font-semibold text-blue-700 bg-transparent border border-blue-700">Follows</button>
+                            <div v-if="can.create_update == true">
+                                <jet-secondary-button class="mb-4" @click="createNewPost=true">Add New Post</jet-secondary-button>
+                                <jet-secondary-button class="mb-4" @click="editProfile=true">edit Profile</jet-secondary-button>
+                            </div>
+                        </div>
+                        <div class="mb-4 flex flex-row">
+                            <div class="mr-10">게시물 <span class="font-black">{{ posts.length }}</span></div>
+                            <div class="mr-10">팔로워 80</div>
+                            <div class="mr-10">팔로우 72</div>
+                        </div>
+                        <div class="mb-4">{{ user.username }}</div>
+                        <div class="mb-2 font-semibold text-lg">{{ user.profile? user.profile.title : 'No Title' }}</div>
+                        <div class='mb-4'>{{ user.profile? user.profile.description : 'No Description' }}</div>
+                    </div>
                 </div>
             </div>
-
-
         </template>
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
@@ -69,6 +75,33 @@
             </template>
         </jet-dialog-modal>
 
+        <jet-dialog-modal :show="editProfile" @close="editProfile = false">
+            <template #title>
+                Update Profile
+            </template>
+
+            <template #content>
+                <form @submit.prevent="updateProfile">
+                    <div class="mb-2">
+                        <jet-label for="title" value="title" />
+                        <jet-input id="title" type="text" class="black w-full mt-1" v-model="updateProfileForm.title" required autofocus autocomplete="title" />
+                        <jet-input-error :message="updateProfileForm.errors.title" class="mt-2" />
+                    </div>
+
+                    <div class="mb-2">
+                        <jet-label for="description" value="description" />
+                        <textarea id="description" cols="40" rows="10" class="form-textarea" v-model="updateProfileForm.description" required autofocus autocomplete="description"></textarea>
+                        <jet-input-error :message="updateProfileForm.errors.description" class="mt-2" />
+                    </div>
+                </form>
+            </template>
+            <template #footer>
+                <jet-secondary-button @click.prevent="updateProfile">
+                    Update Profile
+                </jet-secondary-button>
+            </template>
+        </jet-dialog-modal>
+
     </app-layout>
 </template>
 
@@ -83,7 +116,7 @@
     import JetLabel from '@/Jetstream/Label.vue';
 
     export default defineComponent({
-        props: ['user', 'posts'],
+        props: ['user', 'posts', 'can'],
         components: {
             AppLayout,
             PostList,
@@ -102,6 +135,12 @@
                     image: '',
                 }),
                 imagePreview: null,
+                editProfile: false,
+                updateProfileForm: this.$inertia.form({
+                    _method: 'PATCH',
+                    title: this.user.profile.title,
+                    description: this.user.profile.description,
+                }),
             }
         },
 
@@ -113,7 +152,10 @@
                 this.form.post(route('post.store'), {
                     errorBag: 'createNewPost',
                     preserveScroll: true,
-                    onSuccess: () => { this.createNewPost = false; this.clearFields(); },
+                    onSuccess: () => { 
+                        this.createNewPost = false; 
+                        this.clearFields(); 
+                    },
                 });
             },
 
@@ -135,6 +177,22 @@
             selectNewImage() {
                 this.$refs.image.click();
             },
-        }
-    })
+
+            initUpdateProfilesFields() {
+                this.updateProfileForm.title = this.user.profile.title;
+                this.updateProfileForm.description = this.user.profile.description;
+            },
+
+            updateProfile() {
+                this.updateProfileForm.post(route('profile.update'), {
+                    errorBag: 'updateProfile',
+                    preserveScroll: true,
+                    onSuccess: () => { 
+                        this.editProfile = false;
+                        this.initUpdateProfilesFields(); 
+                    },
+                });
+            },
+        },
+    });
 </script>
