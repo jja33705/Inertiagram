@@ -4,14 +4,14 @@
             <div class="flex flex-col items-start md:flex-row">
                 <div class="flex flex-row items-start">
                     <div class="flex-shrink-0 mr-3 px-40" v-if="$page.props.jetstream.managesProfilePhotos">
-                        <img :src="user.profile_photo_url" :alt="user.name" class="rounded-full h-40 w-40 object-cover">
+                        <img :src="profile_user.profile_photo_url" :alt="profile_user.name" class="rounded-full h-40 w-40 object-cover">
                     </div>
                     <div class="flex-col justify-items-start">
                         <div class="flex flex-row items-end my-4">
                             <h2 class="mb-4 font-semibold text-xl text-gray-800 leading-tight">
-                                {{ user.name }}
+                                {{ profile_user.name }}
                             </h2>
-                            <button class="px-2 mx-4 mb-4 font-semibold text-blue-700 bg-transparent border border-blue-700">Follows</button>
+                            <follow-button :profile_user="profile_user" />
                             <div v-if="can.create_update == true">
                                 <jet-secondary-button class="mb-4" @click="createNewPost=true">Add New Post</jet-secondary-button>
                                 <jet-secondary-button class="mb-4" @click="editProfile=true">edit Profile</jet-secondary-button>
@@ -19,12 +19,12 @@
                         </div>
                         <div class="mb-4 flex flex-row">
                             <div class="mr-10">게시물 <span class="font-black">{{ posts.length }}</span></div>
-                            <div class="mr-10">팔로워 80</div>
-                            <div class="mr-10">팔로우 72</div>
+                            <div class="mr-10">팔로워 {{ followers }}</div>
+                            <div class="mr-10">팔로우 {{ profile_user.following.length }}</div>
                         </div>
-                        <div class="mb-4">{{ user.username }}</div>
-                        <div class="mb-2 font-semibold text-lg">{{ user.profile? user.profile.title : 'No Title' }}</div>
-                        <div class='mb-4'>{{ user.profile? user.profile.description : 'No Description' }}</div>
+                        <div class="mb-4">{{ profile_user.profile_username }}</div>
+                        <div class="mb-2 font-semibold text-lg">{{ profile_user.profile? profile_user.profile.title : 'No Title' }}</div>
+                        <div class='mb-4'>{{ profile_user.profile? profile_user.profile.description : 'No Description' }}</div>
                     </div>
                 </div>
             </div>
@@ -114,9 +114,10 @@
     import JetInput from '@/Jetstream/Input.vue';
     import JetInputError from '@/Jetstream/InputError.vue';
     import JetLabel from '@/Jetstream/Label.vue';
+    import FollowButton from '@/Components/FollowButton'
 
     export default defineComponent({
-        props: ['user', 'posts', 'can'],
+        props: ['profile_user', 'posts', 'can', 'followers'],
         components: {
             AppLayout,
             PostList,
@@ -125,6 +126,7 @@
             JetInput,
             JetInputError,
             JetLabel,
+            FollowButton
         },
         data() {
             return {
@@ -138,8 +140,8 @@
                 editProfile: false,
                 updateProfileForm: this.$inertia.form({
                     _method: 'PATCH',
-                    title: this.user.profile.title,
-                    description: this.user.profile.description,
+                    title: this.profile_user.profile.title,
+                    description: this.profile_user.profile.description,
                 }),
             }
         },
@@ -179,8 +181,8 @@
             },
 
             initUpdateProfilesFields() {
-                this.updateProfileForm.title = this.user.profile.title;
-                this.updateProfileForm.description = this.user.profile.description;
+                this.updateProfileForm.title = this.profile_user.profile.title;
+                this.updateProfileForm.description = this.profile_user.profile.description;
             },
 
             updateProfile() {

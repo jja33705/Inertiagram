@@ -21,9 +21,10 @@ class ProfilesController extends Controller
 
         if ($user) {
             return Inertia::render('Dashboard', [
-                'user' => $user,
+                'profile_user' => $user,
                 'posts' => $user->posts,
                 'can' => ['create_update' => Auth::user()->id == $user->id],
+                'followers' => $user->profile->followers->count(),
             ]);
         } else {
             return Inertia::render('Notfound');

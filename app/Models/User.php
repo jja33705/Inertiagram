@@ -40,7 +40,7 @@ class User extends Authenticatable
         });
     }
 
-    protected $with = ['profile'];
+    protected $with = ['profile', 'following'];
 
     /**
      * The attributes that should be hidden for serialization.
@@ -80,5 +80,10 @@ class User extends Authenticatable
     public function posts()
     {
         return $this->hasMany(Post::class)->latest();
+    }
+
+    public function following()
+    {
+        return $this->belongsToMany(Profile::class);
     }
 }
